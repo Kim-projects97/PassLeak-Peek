@@ -2,37 +2,73 @@ import hashlib
 import requests
 
 # === Startpunkt ===
-print("==============================================================================")
-print("Welcome to PassLeak Peek!")
-print("This script will look through known leaked passwords and check if it can find\nyour password in any of the leaked lists.")
-print("==============================================================================")
+def main_meny():
+       while True:
+            print("======================================================================================")
+            print("Welcome to PassLeak Peek!")
+            print("This script will look through known leaked passwords and check if it can find\nyour password in any of the leaked lists.")
+            print("If your password is found, it is highly recommended to change it immediately.")
+            print("You can also use this tool to check the strength of your password against known leaks,")
+            print("and generate a new strong password if needed.")
+            print("======================================================================================")
+            print("Choose an option:")
+            print("1. Check a password")
+            print("2. Generate a new strong password")
+            print("3. Exit program")
+            print("======================================================================================")
+            
+            choice = input(str("Enter your choice (1, 2 or 3): "))
+            if choice == "1":
+                # Function for translating password to SHA-1 hash
+                Userpassword = input(str("Write the password you wanna check and press enter: "))
+                def hash_password(Userpassword):
+                    return hashlib.sha1(Userpassword.encode('utf-8')).hexdigest().upper() 
+
+                # Ta bort print när allt är klart
+                print("Hashed password:", hash_password(Userpassword))  
+        # Function checks password hash against the Have I Been Pwned API
+                def check_hash_with_api(Userpassword):
+                    sha1_hash = hash_password(Userpassword)
+                    prefix, suffix = sha1_hash[:5], sha1_hash[5:]
+                    url = f"https://api.pwnedpasswords.com/range/{prefix}"
+                    r = requests.get(url)
+                    if r.status_code != 200:
+                        print("API-fel:", r.status_code); return None
+                    for line in r.text.splitlines():
+                        hash_suffix, count = line.split(":")
+                        if hash_suffix == suffix:
+                            print(f"Lösenordet är läckt ({count} gånger).")
+                            print("======================================================================================")
+                            return True
+                        
+                    print("Inte hittat i databasen."); 
+                    return False
+                
+                check_hash_with_api(Userpassword)
+                while True:
+                    again = input("Do you want to check another password? (y/n): ").strip().lower()
+                    if again == "y": 
+                        check_hash_with_api(Userpassword = input(str("Write the password you wanna check and press enter: ")))
+                    elif again == "n":
+                        print("Exiting the program. Stay safe!")
+                        break
+            
+            elif choice == "2":
+                print("Generating a new strong password...")
+            
+            elif choice == "3":
+                print("Exiting the program. Stay safe!")
+                print("======================================================================================")
+                break
+            else:
+                print("Invalid choice. Please enter 1, 2 or 3")
+
+main_meny()
+
 # Användaren skriver in ett lösenord
-Userpassword = input(str("Write the password you wanna check and press enter: "))
 
 
-# Function for translating password to SHA-1 hash
-def hash_password(Userpassword):
-    return hashlib.sha1(Userpassword.encode('utf-8')).hexdigest().upper() 
 
-# Ta bort print när allt är klart
-print("Hashed password:", hash_password(Userpassword))  
-
-# Function checks password hash against the Have I Been Pwned API
-def check_hash_with_api(Userpassword):
-    sha1_hash = hash_password(Userpassword)
-    prefix, suffix = sha1_hash[:5], sha1_hash[5:]
-    url = f"https://api.pwnedpasswords.com/range/{prefix}"
-    r = requests.get(url)
-    if r.status_code != 200:
-        print("API-fel:", r.status_code); return None
-    for line in r.text.splitlines():
-        hash_suffix, count = line.split(":")
-        if hash_suffix == suffix:
-            print(f"Lösenordet är läckt ({count} gånger).")
-            return True
-    print("Inte hittat i databasen."); return False
-
-check_hash_with_api(Userpassword)
 
     # 2. Bygg URL för API-anropet
     #    → Exempel: "https://api.pwnedpasswords.com/range/<hash-prefix>"
