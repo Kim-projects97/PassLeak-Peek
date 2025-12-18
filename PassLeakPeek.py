@@ -1,7 +1,28 @@
 import hashlib
 import requests
-
+import re
 # === Startpunkt ===
+def validate_password(Userpassword: str) -> bool:
+    # Minst en stor bokstav
+    has_upper = re.search(r"[A-Z]", Userpassword)
+    # Minst en siffra
+    has_digit = re.search(r"[0-9]", Userpassword)
+    # Minst ett specialtecken
+    has_special = re.search(r"[!@#$%^&*(),.?\":{}|<>]", Userpassword)
+
+    if has_upper and has_digit and has_special:
+        print("The password meets the requirements.")
+        return True
+    else:
+        print(" ❗ \033[1mThe password does not meet the requirements.\033[0m❗")
+        if not has_upper:
+            print("- ⚠️  Password is missing an uppercase letter")
+        if not has_digit:
+            print("- ⚠️  The password is missing a digit")
+        if not has_special:
+            print("- ⚠️  Password is missing a special character")
+        return False
+#Function for the main menu
 def main_meny():
        while True:
             print("======================================================================================")
@@ -37,13 +58,15 @@ def main_meny():
                     for line in r.text.splitlines():
                         hash_suffix, count = line.split(":")
                         if hash_suffix == suffix:
-                            print(f"Lösenordet är läckt ({count} gånger).")
+                            print(f"Your password has been leaked ({count} times).")
+                            validate_password(Userpassword)
                             print("======================================================================================")
                             return True
                         
-                    print("Inte hittat i databasen."); 
+                    print("Not found in database."); 
+                    print("======================================================================================")
                     return False
-                
+               # Function to check another password without restarting the program 
                 check_hash_with_api(Userpassword)
                 while True:
                     again = input("Do you want to check another password? (y/n): ").strip().lower()
