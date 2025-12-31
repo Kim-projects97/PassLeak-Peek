@@ -40,10 +40,12 @@ def main_meny():
             print("Choose an option:")
             print("1. Check a password")
             print("2. Generate a new strong password")
-            print("3. Exit program")
+            print("3. What makes a strong password?")
+            print("4. Why should I check my password?")
+            print("5. Exit program")
             print("======================================================================================")
             
-            choice = input(str("Enter your choice (1, 2 or 3): "))
+            choice = input(str("Enter your choice (1, 2, 3, 4 or 5): "))
             if choice == "1":
                 # Function for translating password to SHA-1 hash
                 Userpassword = input(str("Write the password you wanna check and press enter: "))
@@ -142,23 +144,48 @@ def main_meny():
                         while True:
                             again = input("Do you want to generate another password? (y/n): ").strip().lower()
                             if again == "y":
-                                break   # hoppar tillbaka till huvudmenyn
+                                break   # Goes back to the start of the password generator menu loop
                             elif again == "n":
                                 print("Exiting the password generator.")
-                                return   # avslutar hela funktionen
+                                return   # Ends the password generator menu function and returns to the main menu
                             else:
                                 print("Invalid choice. Please enter 'y' or 'n'.")
 
 
                 if __name__ == "__main__":
                     password_generator_menu()
-
             elif choice == "3":
+               while True:
+                    print("======================================================================================")
+                    print("A strong password typically includes:")
+                    print("- At least 12 characters in length")
+                    print("- A mix of uppercase and lowercase letters")
+                    print("- Inclusion of numbers and special characters")
+                    print("- Avoidance of common words or easily guessable information")
+                    print("Using a combination of these elements helps enhance the security of your password.")
+                    print("======================================================================================")
+                    input("Press Enter to return to the main menu...")
+                    break
+               
+            elif choice == "4":
+                while True:
+                    print("======================================================================================")
+                    print("Checking your password against known leaks is crucial because:")
+                    print("- It helps identify if your password has been compromised in data breaches")
+                    print("- Using a leaked password puts your accounts at risk of unauthorized access")
+                    print("- Regularly checking ensures you maintain strong security practices")
+                    print("- It encourages the use of unique passwords for different accounts")
+                    print("By staying vigilant, you can protect your personal information and online presence.")
+                    print("======================================================================================")
+                    input("Press Enter to return to the main menu...")
+                    break
+
+            elif choice == "5":
                 print("Exiting the program. Stay safe!")
                 print("======================================================================================")
                 break
             else:
-                print("Invalid choice. Please enter 1, 2 or 3")
+                print("Invalid choice. Please enter 1, 2, 3, 4 or 5")
 main_meny()
 
 
