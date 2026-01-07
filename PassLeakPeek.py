@@ -3,6 +3,26 @@ import requests
 import re
 import secrets
 import string
+import platform
+import sys
+import urllib.request
+
+def check_windows():
+    if platform.system() != "Windows":
+        print("This script is designed to run on Windows.")
+        sys.exit(1) 
+    else:
+        print("Windows environment verified, continuing...")
+
+def check_internet_connection_http():
+    try:
+        urllib.request.urlopen("https://api.pwnedpasswords.com/range/AAAAA", timeout=3)
+        print("Internet connection verified...")
+    except Exception:
+        print("ERROR: No internet connection detected,.")
+        sys.exit(1)
+
+
 
 
 # Function to validate password strength
@@ -90,7 +110,7 @@ def main_meny():
                     characters = string.ascii_letters + string.digits
                     
                     # List with symbols to exclude from the passwordgenerator for safety reasons
-                    forbidden = [' ', '"', "'", '´', '¨', '^', '<', '>', '\\', '/',',']
+                    forbidden = [' ', '"', "'", '´', '¨', '^', '<', '>', '\\', '/',',', ';', ':', '`', '~','.']
                     allowed_symbols = ''.join(ch for ch in string.punctuation if ch not in forbidden)
                     
                     # adds special characters to the pool of regular characters
@@ -186,34 +206,6 @@ def main_meny():
                 break
             else:
                 print("Invalid choice. Please enter 1, 2, 3, 4 or 5")
+check_windows()
+check_internet_connection_http()
 main_meny()
-
-
-# Funktion: Jämför lösenordet med en databas över kända läckta lösenord
-# Om lösenordet finns i listan:
-    # → Skriv ut varning om att lösenordet är läckt
-    # → Erbjud användaren att generera ett nytt starkt lösenord
-        # Om användaren accepterar:
-            # → Generera nytt lösenord som inte finns i listorna
-            # → Avsluta
-        # Om användaren nekar:
-            # → Avsluta
-
-# Om lösenordet inte finns i listan:
-    # === Steg 2: Kontrollera likhet med läckta lösenord ===
-    # Funktion: Analysera om 70% eller mer av lösenordet matchar någon lista
-    # Om JA:
-        # → Skriv ut att lösenordet liknar läckta lösenord
-        # → Rekommendera att göra lösenordet starkare
-        # → Avsluta
-    # Om NEJ:
-        # === Steg 3: Kontrollera komplexitet ===
-        # Funktion: Kontrollera om lösenordet har specialtecken, versaler och är längre än 12 tecken
-        # Om JA:
-            # → Skriv ut att lösenordet inte är läckt och verkar starkt
-            # → Rekommendera att kontrollera lösenordet regelbundet
-            # → Avsluta
-        # Om NEJ:
-            # → Skriv ut att lösenordet inte är läckt men saknar viktiga säkerhetskomponenter
-            # → Rekommendera att förbättra lösenordet
-            # → Avsluta
