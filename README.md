@@ -16,7 +16,8 @@ PassLeakPeek aims to:
 - Help users understand the security level of their passwords through validation rules.
 - Log password checks without ever storing the real password, using randomized masking.
 - Offer a simple, menu-driven interface suitable for both beginners and technical users.
-- Serve as an educational tool for understanding hashing, API usage, and secure logging.
+- Serve as an educational tool for understanding password security and helps users create new safer passwords.
+- Created to assist individuals of all ages who may not be aware of modern password security standards.
 
 
 ## Functionality
@@ -30,6 +31,11 @@ PassLeakPeek aims to:
 ### Password Strength Validation
 - Evaluates password complexity (length, symbols, numbers, uppercase/lowercase).
 - Provides feedback to help users improve weak passwords.
+
+### Password Generation
+- Generates strong, randomized passwords using uppercase/lowercase letters, numbers, and special characters.
+- Designed to be simple and and user friendly.
+- Helps users create secure passwords before checking them for known breaches.
 
 ### Secure Logging
 - Saves masked versions of tested passwords to `PasswordLeaked.txt`.
@@ -73,7 +79,7 @@ cd PassLeak-Peek
 ### 2. Install dependencies
 
 
-pip install requests
+pip install requests  (or pip3 install requests if needed)
 
 
 ### 3. Run the program
