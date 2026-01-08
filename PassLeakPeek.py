@@ -9,13 +9,15 @@ import urllib.request
 import random 
 import os
 
-def check_windows():
-    if platform.system() != "Windows":
-        print("This script is designed to run on Windows.")
+# Function to check if the OS is Windows or MacOS
+def check_os():
+    if platform.system() not in ("Windows", "Darwin"):
+        print("This script is designed to run on Windows or MacOS.")
         sys.exit(1) 
     else:
         print("Windows environment verified, continuing...")
 
+# Function to check if the user has internet connection
 def check_internet_connection_http():
     try:
         urllib.request.urlopen("https://api.pwnedpasswords.com/range/AAAAA", timeout=3)
@@ -81,7 +83,7 @@ def validate_password(Userpassword):
             print("- ⚠️  Password is too short (minimum 8 characters)")
         return False
 # Function for the main menu
-def main_meny():
+def main_menu():
        while True:
             print("======================================================================================")
             print("Welcome to PassLeak Peek!")
@@ -242,6 +244,6 @@ def main_meny():
                 break
             else:
                 print("Invalid choice. Please enter 1, 2, 3, 4 or 5")
-check_windows()
+check_os()
 check_internet_connection_http()
-main_meny()
+main_menu()
