@@ -6,6 +6,8 @@ import string
 import platform
 import sys
 import urllib.request
+import random 
+import os
 
 def check_windows():
     if platform.system() != "Windows":
@@ -21,6 +23,37 @@ def check_internet_connection_http():
     except Exception:
         print("ERROR: No internet connection detected,.")
         sys.exit(1)
+
+# Function to mask password for security reasons
+def mask_password(password):
+    if len(password) <= 2:
+        return "*" * random.randint(3, 8)
+
+    first = password[0]
+    last = password[-1]
+
+    mask_length = random.randint(5, 12) 
+    mask = "*" * mask_length
+
+    return f"{first}{mask}{last}"
+
+# Function to save leaked password info to a text file
+def save_leaked_password(password, leak_count):
+    masked = mask_password(password)
+
+    file_exists = os.path.exists("PasswordLeaked.txt")
+
+    with open("PasswordLeaked.txt", "a", encoding="utf-8") as f:
+
+        # Write header note only if the file is being created for the first time
+        if not file_exists:
+            f.write("======================================================================================================\n")
+            f.write("NOTE: The programm added * to mask your password for security reasons.\n")
+            f.write("So dont be alarmed if you see too many/few * in your password and focus only on first and last symbol\n")
+            f.write("======================================================================================================\n")
+
+        
+        f.write(f"{masked} | Leaked: {leak_count} times\n")
 
 
 
@@ -89,10 +122,13 @@ def main_meny():
                             print(f"Your password has been leaked ({count} times).")
                             validate_password(Userpassword)
                             print("======================================================================================")
+                            save_leaked_password(Userpassword, count)
                             return True
                         
                     print("Not found in database."); 
                     print("======================================================================================")
+                    save_leaked_password(Userpassword, 0)
+
                     return False
                # Function to check another password without restarting the program 
                 check_hash_with_api(Userpassword)
