@@ -39,6 +39,30 @@ def mask_password(password):
 
     return f"{first}{mask}{last}"
 
+# Function to hash password 
+def hash_password(password):
+    return hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+
+# Function to check password hash with the API on haveibeenpwned
+def check_hash_with_api(password):
+    sha1_hash = hash_password(password)
+    prefix, suffix = sha1_hash[:5], sha1_hash[5:]
+    url = f"https://api.pwnedpasswords.com/range/{prefix}"
+    r = requests.get(url)
+    if r.status_code != 200:
+        print("API error:", r.status_code)
+        return None
+    for line in r.text.splitlines():
+        hash_suffix, count = line.split(":")
+        if hash_suffix == suffix:
+            print(f"Your password has been leaked ({count} times).")
+            validate_password(password)
+            save_leaked_password(password, count)
+            return True
+    print("Not found in database.")
+    save_leaked_password(password, 0)
+    return False
+
 # Function to save leaked password info to a text file
 def save_leaked_password(password, leak_count):
     masked = mask_password(password)
@@ -82,6 +106,69 @@ def validate_password(Userpassword):
         if not has_length:
             print("- ⚠️  Password is too short (minimum 8 characters)")
         return False
+
+
+                # Function to generate a strong password
+def generate_password(length):
+    characters = string.ascii_letters + string.digits
+                    
+     # List with symbols to exclude from the passwordgenerator for safety reasons
+    forbidden = [' ', '"', "'", '´', '¨', '^', '<', '>', '\\', '/',',', ';', ':', '`', '~','.']
+    allowed_symbols = ''.join(ch for ch in string.punctuation if ch not in forbidden)           
+     # adds special characters to the pool of regular characters
+    characters += allowed_symbols             
+      # Generate the password randomly from the character and allowed_symbols
+    return ''.join(secrets.choice(characters) for _ in range(length))
+
+def password_generator_menu():
+    while True:
+        print("======================================================================================")
+        print("\n--- Password Generator Menu ---")
+        print("1. Generate 8-character password")
+        print("2. Generate 12-character password")
+        print("3. Generate 16-character password")
+        print("4. Exit program")
+        print("======================================================================================")
+        # Stops the program from crashing if the user inputs a letter instead of a number
+        try:
+            choice = int(input("Choose an option (1-4): "))
+            if choice < 1 or choice > 4:
+                print("Invalid input. Please enter a number between 1 and 4.")
+                continue
+        except ValueError:
+            print("Invalid input. Please enter a number between 1 and 4.")
+            continue
+
+
+        if choice == 1:
+            print("Your new 8-character password:", generate_password(8))
+            print("======================================================================================")
+
+        elif choice == 2:
+            print("Your new 12-character password:", generate_password(12))
+            print("======================================================================================")
+
+        elif choice == 3:
+            print("Your new 16-character password:", generate_password(16))
+            print("======================================================================================")
+
+        elif choice == 4:
+            print("Ending the program...")
+            print("======================================================================================")
+            break
+        else:
+            print("Invalid input. Please enter a number between 1 and 4.")
+            print("======================================================================================")
+        while True:
+            again = input("Do you want to generate another password? (y/n): ").strip().lower()
+            if again == "y":
+                break   # Goes back to the start of the password generator menu loop
+            elif again == "n":
+                print("Exiting the password generator.")
+                return   # Ends the password generator menu function and returns to the main menu
+            else:
+                print("Invalid choice. Please enter 'y' or 'n'.")
+
 # Function for the main menu
 def main_menu():
        while True:
@@ -98,120 +185,45 @@ def main_menu():
             print("3. What makes a strong password?")
             print("4. Why should I check my password?")
             print("5. Exit program")
+            print("Type -h for help or -v for version information")
             print("======================================================================================")
             
+
+
+            
             choice = input(str("Enter your choice (1, 2, 3, 4 or 5): "))
+            
+            if choice == "-h":
+                print("\nHelp:")
+                print("1 - Check if a password has been leaked")
+                print("2 - Generate a secure password")
+                print("-v - Show version information")
+                print("-h - Show this help menu")
+                continue
+
+
+            if choice == "-v":
+                print("\nPassLeakPeek version 1.0.10")
+                print("Developed by Kim-Projects97")
+                continue
+
+            
+            
             if choice == "1":
-                # Function for translating password to SHA-1 hash
-                Userpassword = input(str("Write the password you wanna check and press enter: "))
-                def hash_password(Userpassword):
-                    return hashlib.sha1(Userpassword.encode('utf-8')).hexdigest().upper() 
-
-                # Ta bort print när allt är klart
-                print("Hashed password:", hash_password(Userpassword)) 
-
-        # Function checks password hash against the Have I Been Pwned API
-                def check_hash_with_api(Userpassword):
-                    sha1_hash = hash_password(Userpassword)
-                    prefix, suffix = sha1_hash[:5], sha1_hash[5:]
-                    url = f"https://api.pwnedpasswords.com/range/{prefix}"
-                    r = requests.get(url)
-                    if r.status_code != 200:
-                        print("API-fel:", r.status_code); return None
-                    for line in r.text.splitlines():
-                        hash_suffix, count = line.split(":")
-                        if hash_suffix == suffix:
-                            print(f"Your password has been leaked ({count} times).")
-                            validate_password(Userpassword)
-                            print("======================================================================================")
-                            save_leaked_password(Userpassword, count)
-                            return True
-                        
-                    print("Not found in database."); 
-                    print("======================================================================================")
-                    save_leaked_password(Userpassword, 0)
-
-                    return False
-               # Function to check another password without restarting the program 
-                check_hash_with_api(Userpassword)
-                while True:
-                    again = input("Do you want to check another password? (y/n): ").strip().lower()
-                    if again == "y": 
-                        check_hash_with_api(Userpassword = input(str("Write the password you wanna check and press enter: ")))
-                    elif again == "n":
-                        print("Exiting the program. Stay safe!")
-                        break
+                if choice == "1":
+                    while True:
+                        user_password = input("Write the password you want to check and press enter: ")
+                        check_hash_with_api(user_password)
+                        again = input("Do you want to check another password? (y/n): ").strip().lower()
+                        if again != "y":
+                            print("Exiting password check. Stay safe!")
+                            break
             
             elif choice == "2":
-                # Function to generate a strong password
-                def generate_password(length):
-                    characters = string.ascii_letters + string.digits
-                    
-                    # List with symbols to exclude from the passwordgenerator for safety reasons
-                    forbidden = [' ', '"', "'", '´', '¨', '^', '<', '>', '\\', '/',',', ';', ':', '`', '~','.']
-                    allowed_symbols = ''.join(ch for ch in string.punctuation if ch not in forbidden)
-                    
-                    # adds special characters to the pool of regular characters
-                    characters += allowed_symbols
-                    
-                    # Generate the password randomly from the character and allowed_symbols
-                    return ''.join(secrets.choice(characters) for _ in range(length))
-
-
-
-                #  Function for the password generator menu
-                def password_generator_menu():
-                    while True:
-                        print("======================================================================================")
-                        print("\n--- Password Generator Menu ---")
-                        print("1. Generate 8-character password")
-                        print("2. Generate 12-character password")
-                        print("3. Generate 16-character password")
-                        print("4. Exit program")
-                        print("======================================================================================")
-                    # Stops the program from crashing if the user inputs a letter instead of a number
-                        try:
-                            choice = int(input("Choose an option (1-4): "))
-                            if choice < 1 or choice > 4:
-                                print("Invalid input. Please enter a number between 1 and 4.")
-                                continue
-                        except ValueError:
-                            print("Invalid input. Please enter a number between 1 and 4.")
-                            continue
-
-
-                        if choice == 1:
-                            print("Your new 8-character password:", generate_password(8))
-                            print("======================================================================================")
-
-                        elif choice == 2:
-                            print("Your new 12-character password:", generate_password(12))
-                            print("======================================================================================")
-
-                        elif choice == 3:
-                            print("Your new 16-character password:", generate_password(16))
-                            print("======================================================================================")
-
-                        elif choice == 4:
-                            print("Ending the program...")
-                            print("======================================================================================")
-                            break
-                        else:
-                            print("Invalid input. Please enter a number between 1 and 4.")
-                            print("======================================================================================")
-                        while True:
-                            again = input("Do you want to generate another password? (y/n): ").strip().lower()
-                            if again == "y":
-                                break   # Goes back to the start of the password generator menu loop
-                            elif again == "n":
-                                print("Exiting the password generator.")
-                                return   # Ends the password generator menu function and returns to the main menu
-                            else:
-                                print("Invalid choice. Please enter 'y' or 'n'.")
-
-
                 if __name__ == "__main__":
                     password_generator_menu()
+            
+            # Write information about strong passwords
             elif choice == "3":
                while True:
                     print("======================================================================================")
@@ -224,7 +236,8 @@ def main_menu():
                     print("======================================================================================")
                     input("Press Enter to return to the main menu...")
                     break
-               
+
+            # Write information about why checking passwords is important   
             elif choice == "4":
                 while True:
                     print("======================================================================================")
