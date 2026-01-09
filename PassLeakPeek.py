@@ -127,7 +127,7 @@ def password_generator_menu():
         print("1. Generate 8-character password")
         print("2. Generate 12-character password")
         print("3. Generate 16-character password")
-        print("4. Exit program")
+        print("4. Exit back to main menu")
         print("======================================================================================")
         # Stops the program from crashing if the user inputs a letter instead of a number
         try:

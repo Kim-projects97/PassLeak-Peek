@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="PassLeakPeek-logo.png" alt="PassLeakPeek Logo" width="300">
+  <img src="Png/PassLeakPeek-logo.png" alt="PassLeakPeek Logo" width="300">
 </p>
 
 
@@ -28,14 +28,27 @@ PassLeakPeek aims to:
 - Compares the returned hash suffixes to determine if the password has been leaked.
 - Displays how many times the password appears in breach datasets.
 
+
 ### Password Strength Validation
 - Evaluates password complexity (length, symbols, numbers, uppercase/lowercase).
 - Provides feedback to help users improve weak passwords.
+<img src="Png/PasswordWeakness.png" alt="Password Weakness Evaluation" width="600">
+
 
 ### Password Generation
 - Generates strong, randomized passwords using uppercase/lowercase letters, numbers, and special characters.
 - Designed to be simple and and user friendly.
 - Helps users create secure passwords before checking them for known breaches.
+<img src="Png/PasswordGenerator.png" alt="Password Generator Demo" width="600">
+
+
+### Educational information about secure password
+- Tells the user what a strong password is and why its strong.
+<img src="Png/WhatIsAStrongPassword.png" alt="What is a strong password" width="600">
+
+- Tells the user why they shoudk use a strong password.
+<img src="Png/WhyUseAStrongPassword.png" alt="Why use a strong password" width="600">
+
 
 ### Secure Logging
 - Saves masked versions of tested passwords to `PasswordLeaked.txt`.
