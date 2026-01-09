@@ -213,8 +213,12 @@ def flag_parser():
         type=int,
         help="-g or --generate for generating a strong password of specified length directly from the command line."   
     )
-    # Flag for clearing the PasswordLeaked.txt file -clear DANIEL
-
+    # Flag for clearing the PasswordLeaked.txt file -clear
+    parser.add_argument(
+        '-clear', '--clear',
+        action='store_true',
+        help="Clear the PasswordLeaked.txt file."
+    )
     return parser
 
 
@@ -253,7 +257,6 @@ def main_menu():
         print("3. What makes a strong password?")
         print("4. Why should I check my password?")
         print("5. Exit program")
-        print("Type -h for help or -v for version information")
         print("======================================================================================")
         
 
