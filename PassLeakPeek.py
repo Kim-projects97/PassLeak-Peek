@@ -1,4 +1,5 @@
 import hashlib
+from html import parser
 import requests
 import re
 import secrets
@@ -8,6 +9,7 @@ import sys
 import urllib.request
 import random 
 import os
+import argparse
 
 # Function to check if the OS is Windows or MacOS
 def check_os():
@@ -82,8 +84,6 @@ def save_leaked_password(password, leak_count):
         f.write(f"{masked} | Leaked: {leak_count} times\n")
 
 
-
-
 # Function to validate password strength
 def validate_password(Userpassword):
     has_upper = re.search(r"[A-Z]", Userpassword)
@@ -127,7 +127,7 @@ def password_generator_menu():
         print("1. Generate 8-character password")
         print("2. Generate 12-character password")
         print("3. Generate 16-character password")
-        print("4. Exit program")
+        print("4. Exit back to main menu")
         print("======================================================================================")
         # Stops the program from crashing if the user inputs a letter instead of a number
         try:
@@ -169,94 +169,148 @@ def password_generator_menu():
             else:
                 print("Invalid choice. Please enter 'y' or 'n'.")
 
+def clear_leaked_password_file():
+    if os.path.exists("PasswordLeaked.txt"):
+        os.remove("PasswordLeaked.txt")
+        print("PasswordLeaked.txt file has been cleared.")
+    else:
+        print("PasswordLeaked.txt file does not exist.")
+
+VERSION = "1.0.10"
+DEVELOPER = "Kim-projects97"
+# Function to parse command-line flags
+def flag_parser():    
+    parser = argparse.ArgumentParser(
+        description=".\n\n"
+                    "  Exampels to use:\n"
+                    "  python3 PassLeakPeek.py -v/--version\n"
+                    "  python3 PassLeakPeek.py -h/--help/\n"
+                    "  python3 PassLeakPeek.py -c/--check <password>\n"
+                    "  python3 PassLeakPeek.py -g/--generate <length>\n\n"
+                    "  python3 PassLeakPeek.py -clear",
+        # For better formatting of help text
+        formatter_class=argparse.RawTextHelpFormatter 
+    )    
+
+    # Flag for version -v/--version
+    parser.add_argument(
+        '-v', '--version', 
+        action='version', 
+        version=f'%(prog)s v{VERSION} developed by {DEVELOPER}', 
+        help="Show program version and developer information."
+    )
+
+    # Flag for checking a password -c/--check
+    parser.add_argument(
+        '-c', '--check',
+        type=str,
+        help="-c or --check for checking a password directly from the command line."
+    )
+
+    # Flag for generating a password -g/--generate
+    parser.add_argument(
+        '-g', '--generate',
+        type=int,
+        help="-g or --generate for generating a strong password of specified length directly from the command line."   
+    )
+    # Flag for clearing the PasswordLeaked.txt file -clear DANIEL
+
+    return parser
+
+
+# Function to run the flag parser and handle flags
+def run_flag_parser():
+    args = flag_parser().parse_args()
+
+    if args.check:
+        check_hash_with_api(args.check)
+        sys.exit(0)
+
+    if args.generate:
+        length = args.generate
+        if length < 8:
+            print("Password length should be at least 8 characters.")
+            sys.exit(1)
+        print("Generated password:", generate_password(length))
+        sys.exit(0)
+    
+    if args.clear:
+        clear_leaked_password_file()
+        sys.exit(0)
 # Function for the main menu
 def main_menu():
-       while True:
-            print("======================================================================================")
-            print("Welcome to PassLeak Peek!")
-            print("This script will look through known leaked passwords and check if it can find\nyour password in any of the leaked lists.")
-            print("If your password is found, it is highly recommended to change it immediately.")
-            print("You can also use this tool to check the strength of your password against known leaks,")
-            print("and generate a new strong password if needed.")
-            print("======================================================================================")
-            print("Choose an option:")
-            print("1. Check a password")
-            print("2. Generate a new strong password")
-            print("3. What makes a strong password?")
-            print("4. Why should I check my password?")
-            print("5. Exit program")
-            print("Type -h for help or -v for version information")
-            print("======================================================================================")
-            
+    while True:
+        print("======================================================================================")
+        print("Welcome to PassLeak Peek!")
+        print("This script will look through known leaked passwords and check if it can find\nyour password in any of the leaked lists.")
+        print("If your password is found, it is highly recommended to change it immediately.")
+        print("You can also use this tool to check the strength of your password against known leaks,")
+        print("and generate a new strong password if needed.")
+        print("======================================================================================")
+        print("Choose an option:")
+        print("1. Check a password")
+        print("2. Generate a new strong password")
+        print("3. What makes a strong password?")
+        print("4. Why should I check my password?")
+        print("5. Exit program")
+        print("Type -h for help or -v for version information")
+        print("======================================================================================")
+        
 
 
             
-            choice = input(str("Enter your choice (1, 2, 3, 4 or 5): "))
-            
-            if choice == "-h":
-                print("\nHelp:")
-                print("1 - Check if a password has been leaked")
-                print("2 - Generate a secure password")
-                print("-v - Show version information")
-                print("-h - Show this help menu")
-                continue
-
-
-            if choice == "-v":
-                print("\nPassLeakPeek version 1.0.10")
-                print("Developed by Kim-Projects97")
-                continue
-
-            
-            
-            if choice == "1":
-                if choice == "1":
-                    while True:
-                        user_password = input("Write the password you want to check and press enter: ")
-                        check_hash_with_api(user_password)
-                        again = input("Do you want to check another password? (y/n): ").strip().lower()
-                        if again != "y":
-                            print("Exiting password check. Stay safe!")
-                            break
-            
-            elif choice == "2":
-                if __name__ == "__main__":
-                    password_generator_menu()
-            
-            # Write information about strong passwords
-            elif choice == "3":
-               while True:
-                    print("======================================================================================")
-                    print("A strong password typically includes:")
-                    print("- At least 12 characters in length")
-                    print("- A mix of uppercase and lowercase letters")
-                    print("- Inclusion of numbers and special characters")
-                    print("- Avoidance of common words or easily guessable information")
-                    print("Using a combination of these elements helps enhance the security of your password.")
-                    print("======================================================================================")
-                    input("Press Enter to return to the main menu...")
+        choice = input(str("Enter your choice (1, 2, 3, 4 or 5): "))
+        
+        if choice == "1":
+            while True:
+                user_password = input("Write the password you want to check and press enter: ")
+                check_hash_with_api(user_password)
+                again = input("Do you want to check another password? (y/n): ").strip().lower()
+                if again != "y":
+                    print("Exiting password check. Stay safe!")
                     break
-
-            # Write information about why checking passwords is important   
-            elif choice == "4":
-                while True:
-                    print("======================================================================================")
-                    print("Checking your password against known leaks is crucial because:")
-                    print("- It helps identify if your password has been compromised in data breaches")
-                    print("- Using a leaked password puts your accounts at risk of unauthorized access")
-                    print("- Regularly checking ensures you maintain strong security practices")
-                    print("- It encourages the use of unique passwords for different accounts")
-                    print("By staying vigilant, you can protect your personal information and online presence.")
-                    print("======================================================================================")
-                    input("Press Enter to return to the main menu...")
-                    break
-
-            elif choice == "5":
-                print("Exiting the program. Stay safe!")
+        
+        elif choice == "2":
+            if __name__ == "__main__":
+                password_generator_menu()
+        
+        # Write information about strong passwords
+        elif choice == "3":
+            while True:
                 print("======================================================================================")
+                print("A strong password typically includes:")
+                print("- At least 12 characters in length")
+                print("- A mix of uppercase and lowercase letters")
+                print("- Inclusion of numbers and special characters")
+                print("- Avoidance of common words or easily guessable information")
+                print("Using a combination of these elements helps enhance the security of your password.")
+                print("======================================================================================")
+                input("Press Enter to return to the main menu...")
                 break
-            else:
-                print("Invalid choice. Please enter 1, 2, 3, 4 or 5")
-check_os()
-check_internet_connection_http()
-main_menu()
+
+        # Write information about why checking passwords is important   
+        elif choice == "4":
+            while True:
+                print("======================================================================================")
+                print("Checking your password against known leaks is crucial because:")
+                print("- It helps identify if your password has been compromised in data breaches")
+                print("- Using a leaked password puts your accounts at risk of unauthorized access")
+                print("- Regularly checking ensures you maintain strong security practices")
+                print("- It encourages the use of unique passwords for different accounts")
+                print("By staying vigilant, you can protect your personal information and online presence.")
+                print("======================================================================================")
+                input("Press Enter to return to the main menu...")
+                break
+
+        elif choice == "5":
+            print("Exiting the program. Stay safe!")
+            print("======================================================================================")
+            break
+        else:
+            print("Invalid choice. Please enter 1, 2, 3, 4 or 5")
+
+if __name__ == "__main__":
+    check_os()
+    check_internet_connection_http()
+    run_flag_parser()
+    main_menu()
