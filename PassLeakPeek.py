@@ -10,6 +10,8 @@ import urllib.request
 import random 
 import os
 import argparse
+from datetime import datetime
+
 
 # Function to check if the OS is Windows or MacOS
 def check_os():
@@ -31,7 +33,7 @@ def check_internet_connection_http():
 # Function to mask password for security reasons
 def mask_password(password):
     if len(password) <= 2:
-        return "*" * random.randint(3, 8)
+        return "*" * random.randint(3, 12)
 
     first = password[0]
     last = password[-1]
@@ -81,7 +83,8 @@ def save_leaked_password(password, leak_count):
             f.write("======================================================================================================\n")
 
         
-        f.write(f"{masked} | Leaked: {leak_count} times\n")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:")
+        f.write(f"{timestamp} | {masked} | Leaked: {leak_count} times\n")
 
 
 # Function to validate password strength
@@ -89,7 +92,7 @@ def validate_password(Userpassword):
     has_upper = re.search(r"[A-Z]", Userpassword)
     has_digit = re.search(r"[0-9]", Userpassword)
     has_special = re.search(r"[!@#$%^&*(),.?\":{}|<>]", Userpassword)
-    has_length = len(Userpassword) >= 8
+    has_length = len(Userpassword) >= 12
 
 # Print results of the validation
     if has_upper and has_digit and has_special:
@@ -104,11 +107,11 @@ def validate_password(Userpassword):
         if not has_special:
             print("- ⚠️  Password is missing a special character")
         if not has_length:
-            print("- ⚠️  Password is too short (minimum 8 characters)")
+            print("- ⚠️  Password is too short (minimum 12 characters)")
         return False
 
 
-                # Function to generate a strong password
+# Function to generate a strong password
 def generate_password(length):
     characters = string.ascii_letters + string.digits
                     
@@ -120,6 +123,7 @@ def generate_password(length):
       # Generate the password randomly from the character and allowed_symbols
     return ''.join(secrets.choice(characters) for _ in range(length))
 
+# Function for the password generator menu
 def password_generator_menu():
     while True:
         print("======================================================================================")
@@ -169,6 +173,7 @@ def password_generator_menu():
             else:
                 print("Invalid choice. Please enter 'y' or 'n'.")
 
+# Function to clear the PasswordLeaked.txt file
 def clear_leaked_password_file():
     if os.path.exists("PasswordLeaked.txt"):
         os.remove("PasswordLeaked.txt")
@@ -178,6 +183,7 @@ def clear_leaked_password_file():
 
 VERSION = "1.0.10"
 DEVELOPER = "Kim-projects97"
+
 # Function to parse command-line flags
 def flag_parser():    
     parser = argparse.ArgumentParser(
