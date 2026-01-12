@@ -1,3 +1,4 @@
+from getpass import getpass
 import hashlib
 from html import parser
 import requests
@@ -83,16 +84,16 @@ def save_leaked_password(password, leak_count):
             f.write("======================================================================================================\n")
 
         
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         f.write(f"{timestamp} | {masked} | Leaked: {leak_count} times\n")
 
 
 # Function to validate password strength
-def validate_password(Userpassword):
-    has_upper = re.search(r"[A-Z]", Userpassword)
-    has_digit = re.search(r"[0-9]", Userpassword)
-    has_special = re.search(r"[!@#$%^&*(),.?\":{}|<>]", Userpassword)
-    has_length = len(Userpassword) >= 12
+def validate_password(password):
+    has_upper = re.search(r"[A-Z]", password)
+    has_digit = re.search(r"[0-9]", password)
+    has_special = re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
+    has_length = len(password) >= 12
 
 # Print results of the validation
     if has_upper and has_digit and has_special:
@@ -184,7 +185,7 @@ def clear_leaked_password_file():
 VERSION = "1.0.10"
 DEVELOPER = "Kim-projects97"
 
-# Function to parse command-line flags
+# Function to parse command-line flags LIST
 def flag_parser():    
     parser = argparse.ArgumentParser(
         description=".\n\n"
@@ -272,8 +273,8 @@ def main_menu():
         
         if choice == "1":
             while True:
-                user_password = input("Write the password you want to check and press enter: ")
-                check_hash_with_api(user_password)
+                password = getpass("Write the password you want to check and press enter: ")
+                check_hash_with_api(password)
                 again = input("Do you want to check another password? (y/n): ").strip().lower()
                 if again != "y":
                     print("Exiting password check. Stay safe!")
