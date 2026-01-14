@@ -1,3 +1,4 @@
+from getpass import getpass
 import hashlib
 from html import parser
 import requests
@@ -83,16 +84,16 @@ def save_leaked_password(password, leak_count):
             f.write("======================================================================================================\n")
 
         
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
         f.write(f"{timestamp} | {masked} | Leaked: {leak_count} times\n")
 
 
 # Function to validate password strength
-def validate_password(Userpassword):
-    has_upper = re.search(r"[A-Z]", Userpassword)
-    has_digit = re.search(r"[0-9]", Userpassword)
-    has_special = re.search(r"[!@#$%^&*(),.?\":{}|<>]", Userpassword)
-    has_length = len(Userpassword) >= 12
+def validate_password(password):
+    has_upper = re.search(r"[A-Z]", password)
+    has_digit = re.search(r"[0-9]", password)
+    has_special = re.search(r"[!@#$%^&*(),.?\":{}|<>]", password)
+    has_length = len(password) >= 12
 
 # Print results of the validation
     if has_upper and has_digit and has_special:
@@ -110,18 +111,58 @@ def validate_password(Userpassword):
             print("- ⚠️  Password is too short (minimum 12 characters)")
         return False
 
+def check_generated_password_api(password):
+    sha1_hash = hash_password(password)
+    prefix, suffix = sha1_hash[:5], sha1_hash[5:]
+    url = f"https://api.pwnedpasswords.com/range/{prefix}"
+    r = requests.get(url)
+    if r.status_code != 200:
+        print("API error:", r.status_code)
+        return None
+    for line in r.text.splitlines():
+        hash_suffix, count = line.split(":")
+        if hash_suffix == suffix:
+            return True
+    return False
 
 # Function to generate a strong password
 def generate_password(length):
-    characters = string.ascii_letters + string.digits
-                    
-     # List with symbols to exclude from the passwordgenerator for safety reasons
-    forbidden = [' ', '"', "'", '´', '¨', '^', '<', '>', '\\', '/',',', ';', ':', '`', '~','.']
-    allowed_symbols = ''.join(ch for ch in string.punctuation if ch not in forbidden)           
-     # adds special characters to the pool of regular characters
-    characters += allowed_symbols             
-      # Generate the password randomly from the character and allowed_symbols
-    return ''.join(secrets.choice(characters) for _ in range(length))
+    if length < 8:
+        raise ValueError("Password must be at least 8 characters long to meet all requirements.")
+
+    lowercase = string.ascii_lowercase
+    uppercase = string.ascii_uppercase
+    digits = string.digits
+    forbidden = [' ', '"', "'", '`', '^', '<', '>', '\\', '/', '{', '}', '[', ']', '~', ':']
+    symbols = ''.join(ch for ch in string.punctuation if ch not in forbidden)
+
+    # Makes sure the password contains at least one character from each category
+    required = [
+        secrets.choice(lowercase),
+        secrets.choice(uppercase),
+        secrets.choice(digits),
+        secrets.choice(symbols)
+    ]
+
+    # Creates a pool of all characters
+    all_characters = lowercase + uppercase + digits + symbols
+
+    #  Fills the rest of the password length with random choices from all characters
+    remaining = [secrets.choice(all_characters) for _ in range(length - 4)]
+
+    password_list = required + remaining
+    random.shuffle(password_list)
+
+    return ''.join(password_list)
+
+# Checks generated password against the API to ensure it's not leaked before returning it
+def generate_safe_password(length):
+    while True:
+        pwd = generate_password(length)
+
+        if not check_generated_password_api(pwd):
+            print("Generated a strong password that has not been leaked:")
+            return pwd
 
 # Function for the password generator menu
 def password_generator_menu():
@@ -145,15 +186,15 @@ def password_generator_menu():
 
 
         if choice == 1:
-            print("Your new 8-character password:", generate_password(8))
+            print("Your new 8-character password:", generate_safe_password(8))
             print("======================================================================================")
 
         elif choice == 2:
-            print("Your new 12-character password:", generate_password(12))
+            print("Your new 12-character password:", generate_safe_password(12))
             print("======================================================================================")
 
         elif choice == 3:
-            print("Your new 16-character password:", generate_password(16))
+            print("Your new 16-character password:", generate_safe_password(16))
             print("======================================================================================")
 
         elif choice == 4:
@@ -184,7 +225,7 @@ def clear_leaked_password_file():
 VERSION = "1.0.10"
 DEVELOPER = "Kim-projects97"
 
-# Function to parse command-line flags
+# Function to parse command-line flags LIST
 def flag_parser():    
     parser = argparse.ArgumentParser(
         description=".\n\n"
@@ -272,8 +313,8 @@ def main_menu():
         
         if choice == "1":
             while True:
-                user_password = input("Write the password you want to check and press enter: ")
-                check_hash_with_api(user_password)
+                password = getpass("Write the password you want to check and press enter: ")
+                check_hash_with_api(password)
                 again = input("Do you want to check another password? (y/n): ").strip().lower()
                 if again != "y":
                     print("Exiting password check. Stay safe!")
