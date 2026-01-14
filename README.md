@@ -7,7 +7,7 @@
 - [PassLeakPeek – Password Leak & Strength Analyzer](#passleakpeek--password-leak--strength-analyzer)
 - [Functionality](#functionality)
 - [System Requirements](#system-requirements)
-- [Roadmap](#%EF%B8%8F-roadmap)
+- [Roadmap](#roadmap)
 - [Instructions](#instructions)
 
 # PassLeakPeek – Password Leak & Strength Analyzer
@@ -163,7 +163,7 @@ pip install requests
       <td>🧠 Planned short-term</td>
       <td>Availability</td>
       <td>
-        • Add Swedish langugue
+        • Add Swedish language
       </td>
     </tr>
     <tr>

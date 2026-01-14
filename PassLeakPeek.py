@@ -111,18 +111,58 @@ def validate_password(password):
             print("- ⚠️  Password is too short (minimum 12 characters)")
         return False
 
+def check_generated_password_api(password):
+    sha1_hash = hash_password(password)
+    prefix, suffix = sha1_hash[:5], sha1_hash[5:]
+    url = f"https://api.pwnedpasswords.com/range/{prefix}"
+    r = requests.get(url)
+    if r.status_code != 200:
+        print("API error:", r.status_code)
+        return None
+    for line in r.text.splitlines():
+        hash_suffix, count = line.split(":")
+        if hash_suffix == suffix:
+            return True
+    return False
 
 # Function to generate a strong password
 def generate_password(length):
-    characters = string.ascii_letters + string.digits
-                    
-     # List with symbols to exclude from the passwordgenerator for safety reasons
-    forbidden = [' ', '"', "'", '´', '¨', '^', '<', '>', '\\', '/',',', ';', ':', '`', '~','.']
-    allowed_symbols = ''.join(ch for ch in string.punctuation if ch not in forbidden)           
-     # adds special characters to the pool of regular characters
-    characters += allowed_symbols             
-      # Generate the password randomly from the character and allowed_symbols
-    return ''.join(secrets.choice(characters) for _ in range(length))
+    if length < 8:
+        raise ValueError("Password must be at least 8 characters long to meet all requirements.")
+
+    lowercase = string.ascii_lowercase
+    uppercase = string.ascii_uppercase
+    digits = string.digits
+    forbidden = [' ', '"', "'", '`', '^', '<', '>', '\\', '/', '{', '}', '[', ']', '~', ':']
+    symbols = ''.join(ch for ch in string.punctuation if ch not in forbidden)
+
+    # Makes sure the password contains at least one character from each category
+    required = [
+        secrets.choice(lowercase),
+        secrets.choice(uppercase),
+        secrets.choice(digits),
+        secrets.choice(symbols)
+    ]
+
+    # Creates a pool of all characters
+    all_characters = lowercase + uppercase + digits + symbols
+
+    #  Fills the rest of the password length with random choices from all characters
+    remaining = [secrets.choice(all_characters) for _ in range(length - 4)]
+
+    password_list = required + remaining
+    random.shuffle(password_list)
+
+    return ''.join(password_list)
+
+# Checks generated password against the API to ensure it's not leaked before returning it
+def generate_safe_password(length):
+    while True:
+        pwd = generate_password(length)
+
+        if not check_generated_password_api(pwd):
+            print("Generated a strong password that has not been leaked:")
+            return pwd
 
 # Function for the password generator menu
 def password_generator_menu():
@@ -146,15 +186,15 @@ def password_generator_menu():
 
 
         if choice == 1:
-            print("Your new 8-character password:", generate_password(8))
+            print("Your new 8-character password:", generate_safe_password(8))
             print("======================================================================================")
 
         elif choice == 2:
-            print("Your new 12-character password:", generate_password(12))
+            print("Your new 12-character password:", generate_safe_password(12))
             print("======================================================================================")
 
         elif choice == 3:
-            print("Your new 16-character password:", generate_password(16))
+            print("Your new 16-character password:", generate_safe_password(16))
             print("======================================================================================")
 
         elif choice == 4:
