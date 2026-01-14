@@ -184,7 +184,7 @@ def password_generator_menu():
             print("Invalid input. Please enter a number between 1 and 4.")
             continue
 
-
+        # Hardcoded choices for password lengths to make it easier for the user
         if choice == 1:
             print("Your new 8-character password:", generate_safe_password(8))
             print("======================================================================================")
@@ -282,7 +282,7 @@ def run_flag_parser():
         if length < 8:
             print("Password length should be at least 8 characters.")
             sys.exit(1)
-        print("Generated password:", generate_password(length))
+        print("Generated password:", generate_safe_password(length))
         sys.exit(0)
     
     if args.clear:
@@ -321,7 +321,6 @@ def main_menu():
                     break
         
         elif choice == "2":
-            if __name__ == "__main__":
                 password_generator_menu()
         
         # Write information about strong passwords
