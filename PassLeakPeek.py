@@ -111,6 +111,7 @@ def validate_password(password):
             print("- ⚠️  Password is too short (minimum 12 characters)")
         return False
 
+# Function to check password to api, its the same as check_hash_with_api but used for generated passwords to avoid logging them
 def check_generated_password_api(password):
     sha1_hash = hash_password(password)
     prefix, suffix = sha1_hash[:5], sha1_hash[5:]
